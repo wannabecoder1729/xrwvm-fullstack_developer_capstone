@@ -98,6 +98,7 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
 		"name": data['name'],
 		"dealership": data['dealership'],
 		"review": data['review'],
+                "sentiment": data['sentiment'],
 		"purchase": data['purchase'],
 		"purchase_date": data['purchase_date'],
 		"car_make": data['car_make'],

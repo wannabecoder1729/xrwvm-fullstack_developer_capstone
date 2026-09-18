@@ -1,10 +1,14 @@
 from flask import Flask
 from nltk.sentiment import SentimentIntensityAnalyzer
+import nltk
+import os
 import json
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+nltk.data.path.insert(0, os.path.expanduser("~/nltk_data"))
+
 app = Flask("Sentiment Analyzer")
-
 sia = SentimentIntensityAnalyzer()
-
 
 @app.get('/')
 def home():
