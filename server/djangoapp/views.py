@@ -1,12 +1,60 @@
 import json
 
 from django.http import JsonResponse
+from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import CarMake, CarModel
 from .restapis import get_request, post_review, analyze_review_sentiments
 
+@csrf_exempt
+def register_user(request):
+    if request.method != "POST":
+        return JsonResponse(
+            {"error": "POST request required"},
+            status=405
+        )
+
+    try:
+        data = json.loads(request.body)
+
+        username = data.get("userName", "").strip()
+        first_name = data.get("firstName", "").strip()
+        last_name = data.get("lastName", "").strip()
+        email = data.get("email", "").strip()
+        password = data.get("password", "")
+
+        if not all([username, first_name, last_name, email, password]):
+            return JsonResponse(
+                {"error": "All fields are required"},
+                status=400
+            )
+
+        if User.objects.filter(username=username).exists():
+            return JsonResponse(
+                {"error": "Username already exists"},
+                status=409
+            )
+
+        user = User.objects.create_user(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password
+        )
+
+        return JsonResponse(
+            {"status": "Registration successful", "userName": user.username},
+            status=201
+        )
+
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"error": "Invalid JSON"},
+            status=400
+        )
 
 @csrf_exempt
 def login_user(request):

@@ -9,16 +9,45 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const register = (e) => {
-    e.preventDefault();
+ const register = async (e) => {
+  e.preventDefault();
 
-    if (!userName || !firstName || !lastName || !email || !password) {
-      alert("Please fill in all fields.");
-      return;
+  if (!userName || !firstName || !lastName || !email || !password) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      window.location.origin + "/djangoapp/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userName: userName,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          password: password,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Registration successful! Please log in.");
+      window.location.href = "/login";
+    } else {
+      alert(data.error || "Registration failed.");
     }
-
-    alert("Registration submitted successfully.");
-  };
+  } catch (error) {
+    console.error("Registration error:", error);
+    alert("Unable to connect to the server.");
+  }
+};
 
   return (
     <>
