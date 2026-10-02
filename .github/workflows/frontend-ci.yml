@@ -33,4 +33,4 @@ jobs:
         run: CI=true npm test -- --watchAll=false --passWithNoTests
 
       - name: Build frontend
-        run: npm run build
+        run: CI=false npm run build
