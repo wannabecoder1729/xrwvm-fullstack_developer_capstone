@@ -1,7 +1,7 @@
+import os
 from flask import Flask
 from nltk.sentiment import SentimentIntensityAnalyzer
 import nltk
-import os
 import json
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -35,4 +35,8 @@ def analyze_sentiment(input_txt):
     return result
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5050, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5050)),
+        debug=False
+    )
