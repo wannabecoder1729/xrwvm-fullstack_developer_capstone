@@ -12,23 +12,26 @@ app.use(require('body-parser').urlencoded({ extended: false }));
 const reviews_data = JSON.parse(fs.readFileSync("data/reviews.json", 'utf8'));
 const dealerships_data = JSON.parse(fs.readFileSync("data/dealerships.json", 'utf8'));
 
-mongoose.connect(process.env.MONGO_URL || "mongodb://mongo_db:27017/",{'dbName':'dealershipsDB'});
+
 
 
 const Reviews = require('./review');
 
 const Dealerships = require('./dealership');
 
-try {
-  Reviews.deleteMany({}).then(()=>{
-    Reviews.insertMany(reviews_data['reviews']);
-  });
-  Dealerships.deleteMany({}).then(()=>{
-    Dealerships.insertMany(dealerships_data['dealerships']);
-  });
-  
-} catch (error) {
-  res.status(500).json({ error: 'Error fetching documents' });
+async function seedIfEmpty() {
+  const reviewCount = await Reviews.countDocuments();
+  const dealershipCount = await Dealerships.countDocuments();
+
+  if (dealershipCount === 0) {
+    await Dealerships.insertMany(dealerships_data['dealerships']);
+    console.log('Seeded dealerships');
+  }
+
+  if (reviewCount === 0) {
+    await Reviews.insertMany(reviews_data['reviews']);
+    console.log('Seeded reviews');
+  }
 }
 
 
@@ -88,8 +91,16 @@ app.get('/fetchDealer/:id', async (req, res) => {
 });
 
 //Express route to insert review
-app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
-  data = JSON.parse(req.body);
+app.post('/insert_review', express.json(), async (req, res) => {
+    const data = req.body;
+  
+    console.log("Received review name:", data?.name);
+  
+    if (!data || !data.name) {
+      return res.status(400).json({
+        error: "Review name is missing from request body"
+      });
+    }
   const documents = await Reviews.find().sort( { id: -1 } )
   let new_id = documents[0]['id']+1
 
@@ -116,6 +127,23 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
 });
 
 // Start the Express server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+async function startServer() {
+  try {
+    await mongoose.connect(
+      process.env.MONGO_URL || 'mongodb://mongo_db:27017/',
+      { dbName: 'dealershipsDB' }
+    );
+
+    console.log('Connected to MongoDB');
+    await seedIfEmpty();
+
+    app.listen(port, () => {
+      console.log(`Server is running on http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to connect or initialize MongoDB:', error.message);
+    process.exit(1);
+  }
+}
+
+startServer();

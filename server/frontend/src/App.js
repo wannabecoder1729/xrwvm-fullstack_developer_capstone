@@ -3,11 +3,16 @@ import Register from "./components/Register/Register";
 import Dealers from "./components/Dealers/Dealers";
 import Dealer from "./components/Dealers/Dealer";
 import PostReview from "./components/Dealers/PostReview";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/dealers" replace />} />
+      <Route path="/home" element={<Navigate to="/dealers" replace />} />
+      <Route path="/about" element={<Navigate to="/dealers" replace />} />
+      <Route path="/contact" element={<Navigate to="/dealers" replace />} />
+
       <Route path="/login" element={<LoginPanel />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dealers" element={<Dealers />} />

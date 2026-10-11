@@ -19,14 +19,25 @@ const PostReview = () => {
   const carmodels_url = `/djangoapp/get_cars`;
 
   const postreview = async () => {
-    let name =
-      sessionStorage.getItem("firstname") +
-      " " +
-      sessionStorage.getItem("lastname");
+    const firstname = sessionStorage.getItem("firstname");
+const lastname = sessionStorage.getItem("lastname");
+const username = sessionStorage.getItem("username");
 
-    if (name.includes("null")) {
-      name = sessionStorage.getItem("username");
-    }
+let name = [firstname, lastname]
+  .filter((value) => value && value !== "null" && value !== "undefined")
+  .join(" ")
+  .trim();
+
+if (!name) {
+  name = username && username !== "null" && username !== "undefined"
+    ? username
+    : "Test User";
+}
+
+if (!name || name.trim() === "") {
+  alert("Please log in before posting a review.");
+  return;
+}
 
     if (!model || review.trim() === "" || date === "" || year === "") {
       alert("All details are mandatory");
