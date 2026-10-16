@@ -21,7 +21,7 @@ COPY . .
 
 COPY --from=frontend-build /app/frontend/build ./frontend/build
 
-RUN python manage.py collectstatic --noinput
+RUN DJANGO_SECRET_KEY=build-only-placeholder python manage.py collectstatic --noinput
 
 EXPOSE 8080
 
