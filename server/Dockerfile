@@ -25,4 +25,4 @@ RUN DJANGO_SECRET_KEY=build-only-placeholder python manage.py collectstatic --no
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn djangoproj.wsgi:application --bind 0.0.0.0:8080"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py shell -c 'from djangoapp.populate import initiate; initiate()' && gunicorn djangoproj.wsgi:application --bind 0.0.0.0:8080"]
